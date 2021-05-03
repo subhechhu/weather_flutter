@@ -35,8 +35,8 @@ dev_dependencies:
   http: ^0.13.1
   intl: ^0.17.0
   flutter_spinkit: ^5.0.0
-  flutter_svg: ^0.22.0
   fluttertoast: ^8.0.6
+  progress_dialog: ^1.2.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

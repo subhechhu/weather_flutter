@@ -7,16 +7,14 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-double temp_c;
-int code;
-double humidity;
-double cloud;
-double precip_mm;
-double wind_kph;
-
 class _HomeState extends State<Home> {
   Map weatherResponse = {};
   int code;
+  double temp_c;
+  double humidity;
+  double cloud;
+  double precip_mm;
+  double wind_kph;
 
   @override
   Widget build(BuildContext context) {
@@ -24,12 +22,10 @@ class _HomeState extends State<Home> {
         ? weatherResponse
         : ModalRoute.of(context).settings.arguments;
 
-    print("!!!!!!!!!!!!!!!!!");
-    print(weatherResponse);
-    print("!!!!!!!!!!!!!!!!!");
-
     String location = weatherResponse['location'];
     code = weatherResponse['weather_code'];
+    String country = weatherResponse['country'];
+    String region = weatherResponse['region'];
     String type = weatherResponse['weather_type'];
     bool isDay = weatherResponse['isDay'];
     String time = weatherResponse['time'];
@@ -44,63 +40,95 @@ class _HomeState extends State<Home> {
 
     return Scaffold(
         body: Container(
+      padding: EdgeInsets.symmetric(vertical: 20.0),
       decoration: BoxDecoration(
           image: DecorationImage(
               image: AssetImage('assets/$bgImage'), fit: BoxFit.fill)),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(10, 200, 10, 0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.network('https://flagcdn.com/32x24/$flag.png'),
-                SizedBox(width: 10),
-                Text(
-                  location,
-                  style: TextStyle(
-                      fontSize: 20, color: textColor, letterSpacing: 2),
-                ),
-                TextButton.icon(
-                  onPressed: () async {
-                    dynamic result =
-                        await Navigator.pushNamed(context, '/newlocation');
-                    print("in main");
-                    print(result);
-                    setState(() {
-                      weatherResponse = {
-                        "location": result['location'],
-                        "flag": result['flag'],
-                        "time": result['time'],
-                        "isDay": result['isDay'],
-                        "temp_c": result['temp_c'],
-                        "weather_code": result['weather_code'],
-                        "weather_type": result['weather_type'],
-                        "wind_kph": result['wind_kph'],
-                        "precip_mm": result['precip_mm'],
-                        "humidity": result['humidity'],
-                        "cloud": result['cloud']
-                      };
-                    });
-                  },
-                  icon: Icon(
-                    Icons.edit_location_rounded,
-                    color: textColor,
-                    size: 20,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    location,
+                    style: TextStyle(
+                        fontSize: 20, color: textColor, letterSpacing: 2),
                   ),
-                  label: Text(""),
-                ),
-              ],
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Image.network('https://flagcdn.com/32x24/$flag.png'),
+                ],
+              ),
             ),
-            Text(
-              time,
-              style: TextStyle(
-                  fontSize: 80,
-                  color: textColor,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 2),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+              child: Row(
+                children: [
+                  Text(
+                    country,
+                    style: TextStyle(
+                        fontSize: 20, color: textColor, letterSpacing: 2),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    region,
+                    style: TextStyle(
+                        fontSize: 20, color: textColor, letterSpacing: 2),
+                  ),
+                  TextButton.icon(
+                    onPressed: () async {
+                      dynamic result =
+                          await Navigator.pushNamed(context, '/newlocation');
+                      print("in main");
+                      print(result);
+                      setState(() {
+                        weatherResponse = {
+                          "country": result['country'],
+                          "region": result['region'],
+                          "location": result['location'],
+                          "flag": result['flag'],
+                          "time": result['time'],
+                          "isDay": result['isDay'],
+                          "temp_c": result['temp_c'],
+                          "weather_code": result['weather_code'],
+                          "weather_type": result['weather_type'],
+                          "wind_kph": result['wind_kph'],
+                          "precip_mm": result['precip_mm'],
+                          "humidity": result['humidity'],
+                          "cloud": result['cloud']
+                        };
+                      });
+                    },
+                    icon: Icon(
+                      Icons.edit_location_rounded,
+                      color: textColor,
+                      size: 20,
+                    ),
+                    label: Text("     "),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 50,
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+              child: Text(
+                time,
+                style: TextStyle(
+                    fontSize: 80,
+                    color: textColor,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2),
+              ),
             ),
             SizedBox(
               height: 250,

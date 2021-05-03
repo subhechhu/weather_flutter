@@ -42,6 +42,8 @@ class _SplashState extends State<Splash> {
     await weather.getWeather();
 
     Navigator.pushReplacementNamed(context, '/home', arguments: {
+      'country': "Nepal",
+      'region': "Asia",
       'location': 'Kathmandu',
       'flag': 'np',
       'time': currentTimeStr,

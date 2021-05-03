@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:worldclock/services/weatherservices.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 
 class NewLocation extends StatefulWidget {
   @override
@@ -15,6 +15,8 @@ class _NewLocationState extends State<NewLocation> {
   List _items = [];
   bool isSearching = false;
 
+  ProgressDialog pr;
+
   @override
   void initState() {
     super.initState();
@@ -23,6 +25,9 @@ class _NewLocationState extends State<NewLocation> {
 
   @override
   Widget build(BuildContext context) {
+    pr = ProgressDialog(context,
+        type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
+    styleDialog(pr);
     return Scaffold(
       appBar: AppBar(
         title: isSearching
@@ -37,8 +42,8 @@ class _NewLocationState extends State<NewLocation> {
                         TextStyle(color: Colors.grey[400], fontSize: 20)),
               )
             : Text("Choose A Location"),
-        automaticallyImplyLeading: false,
         backgroundColor: Colors.blueGrey,
+        centerTitle: true,
       ),
       body: Column(
         children: [
@@ -77,11 +82,7 @@ class _NewLocationState extends State<NewLocation> {
   }
 
   void updateLocation(item) async {
-    print(item['capital']);
-    print(item['region']);
-    print(item['alpha2Code'].toLowerCase());
-    print(item['timezones']);
-
+    String country = item['name'];
     String region = item['region'];
     String city = item['capital'];
     String flag = item['alpha2Code'].toLowerCase();
@@ -106,30 +107,19 @@ class _NewLocationState extends State<NewLocation> {
     String currentTime = DateFormat.jm().format(current);
     bool isDay = current.hour > 6 && current.hour < 18 ? true : false;
 
-    Fluttertoast.showToast(
-        msg: "Getting details for ${item['capital']}, ${item['name']}.",
-        toastLength: Toast.LENGTH_LONG,
-        backgroundColor: Colors.blueGrey,
-        textColor: Colors.white,
-        fontSize: 16.0);
+    pr.show();
 
     Weather weather = Weather(location: city);
     await weather.getWeather();
+    pr.hide();
 
-    print("before poping");
-    print(item['capital']);
-    print(flag);
-    print(currentTime);
-    print(isDay);
-    print(weather.temp_c);
-    print(weather.code);
-    print(weather.type);
-    print(weather.wind_kph);
-    print(weather.precip_mm);
-    print(weather.humidity);
-    print(weather.cloud);
+    if (country == item['capital']) {
+      country = "";
+    }
 
     Navigator.pop(context, {
+      'country': country,
+      'region': region,
       'location': item['capital'],
       'flag': flag,
       'time': currentTime,
@@ -142,5 +132,9 @@ class _NewLocationState extends State<NewLocation> {
       'humidity': weather.humidity,
       'cloud': weather.cloud
     });
+  }
+
+  void styleDialog(ProgressDialog pr) {
+    pr.style(message: 'Fetching information...');
   }
 }
