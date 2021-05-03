@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart'; // for api call
@@ -23,7 +24,6 @@ class Weather {
       Map data = jsonDecode(response.body);
 
       if (data.containsKey("error")) {
-        print("inside if method");
         type = "Could Not Get Weather Information";
       } else {
         var current = data['current'];

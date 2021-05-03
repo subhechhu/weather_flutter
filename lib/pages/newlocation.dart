@@ -91,10 +91,6 @@ class _NewLocationState extends State<NewLocation> {
     String offsetHour = item['timezones'].substring(4, 6);
     String offsetMinute = item['timezones'].substring(7, 9);
 
-    print(sign);
-    print(offsetHour);
-    print(offsetMinute);
-
     DateTime currentUtc = DateTime.now().toUtc();
     DateTime current;
     if (sign == "+")
@@ -130,7 +126,10 @@ class _NewLocationState extends State<NewLocation> {
       'wind_kph': weather.wind_kph,
       'precip_mm': weather.precip_mm,
       'humidity': weather.humidity,
-      'cloud': weather.cloud
+      'cloud': weather.cloud,
+      'sign': sign,
+      'offsethour': offsetHour,
+      'offsetminute': offsetMinute
     });
   }
 

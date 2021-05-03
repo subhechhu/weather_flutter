@@ -54,7 +54,10 @@ class _SplashState extends State<Splash> {
       'wind_kph': weather.wind_kph,
       'precip_mm': weather.precip_mm,
       'humidity': weather.humidity,
-      'cloud': weather.cloud
+      'cloud': weather.cloud,
+      'sign': '+',
+      'offsethour': 5,
+      'offsetminute': 45
     });
   }
 }

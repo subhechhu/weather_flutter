@@ -1,6 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:worldclock/services/weatherservices.dart';
 import 'package:worldclock/services/getIcons.dart';
+import 'package:intl/intl.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -10,11 +12,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   Map weatherResponse = {};
   int code;
-  double temp_c;
-  double humidity;
-  double cloud;
-  double precip_mm;
-  double wind_kph;
+  String sign, offsethour, offsetminute;
 
   @override
   Widget build(BuildContext context) {
@@ -37,19 +35,41 @@ class _HomeState extends State<Home> {
     String rain = weatherResponse['precip_mm'].toString() + " mm";
     String humidity = weatherResponse['humidity'].toString() + "%";
     String cloud = weatherResponse['cloud'].toString() + "%";
+    offsethour = weatherResponse['offsethour'];
+    offsetminute = weatherResponse['offsetminute'];
+    sign = weatherResponse['sign'];
 
     return Scaffold(
         body: Container(
-      padding: EdgeInsets.symmetric(vertical: 20.0),
+      padding: EdgeInsets.fromLTRB(0, 56, 0, 50),
       decoration: BoxDecoration(
           image: DecorationImage(
               image: AssetImage('assets/$bgImage'), fit: BoxFit.fill)),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 200, 10, 0),
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
+            SizedBox.fromSize(
+              size: Size(50, 50), // button width and height
+              child: ClipOval(
+                child: Material(
+                  color: Colors.blueGrey.withOpacity(0.5), // button color
+                  child: InkWell(
+                    splashColor: Colors.grey[600], // splash color
+                    onTap: () {
+                      updateTime();
+                    }, // button pressed
+                    child: Icon(
+                      Icons.refresh,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+              padding: const EdgeInsets.fromLTRB(20, 100, 0, 0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -102,7 +122,10 @@ class _HomeState extends State<Home> {
                           "wind_kph": result['wind_kph'],
                           "precip_mm": result['precip_mm'],
                           "humidity": result['humidity'],
-                          "cloud": result['cloud']
+                          "cloud": result['cloud'],
+                          "offsethour": result['offsethour'],
+                          "offsetminute": result['offsetminute'],
+                          "sign": result['sign']
                         };
                       });
                     },
@@ -179,7 +202,7 @@ class _HomeState extends State<Home> {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text(code == 0
                       ? "Could not generate weather for ${weatherResponse['location']}"
-                      : "$type in ${weatherResponse['location']} at ${weatherResponse['time']}: $val"),
+                      : "$type in ${weatherResponse['location']}:   $val"),
                   duration: Duration(seconds: 5),
                 ));
               },
@@ -217,7 +240,7 @@ class _HomeState extends State<Home> {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text(code == 0
                         ? "$type error ${weatherResponse['location']}"
-                        : "$type in ${weatherResponse['location']} at ${weatherResponse['time']}: $val"),
+                        : "$type in ${weatherResponse['location']}:   $val"),
                     duration: Duration(seconds: 5),
                   ));
                 }, // button pressed
@@ -242,5 +265,40 @@ class _HomeState extends State<Home> {
                 ))),
       ),
     );
+  }
+
+  void updateTime() {
+    DateTime currentUtc = DateTime.now().toUtc();
+    DateTime current;
+    if (sign == "+")
+      current = currentUtc.add(Duration(
+          hours: int.parse(offsethour), minutes: int.parse(offsetminute)));
+    else
+      current = currentUtc.subtract(Duration(
+          hours: int.parse(offsethour), minutes: int.parse(offsetminute)));
+
+    String currentTime = DateFormat.jm().format(current);
+    bool isDay = current.hour > 6 && current.hour < 18 ? true : false;
+
+    setState(() {
+      weatherResponse = {
+        "country": weatherResponse['country'],
+        "region": weatherResponse['region'],
+        "location": weatherResponse['location'],
+        "flag": weatherResponse['flag'],
+        "time": currentTime,
+        "isDay": isDay,
+        "temp_c": weatherResponse['temp_c'],
+        "weather_code": weatherResponse['weather_code'],
+        "weather_type": weatherResponse['weather_type'],
+        "wind_kph": weatherResponse['wind_kph'],
+        "precip_mm": weatherResponse['precip_mm'],
+        "humidity": weatherResponse['humidity'],
+        "cloud": weatherResponse['cloud'],
+        "offsethour": weatherResponse['offsethour'],
+        "offsetminute": weatherResponse['offsetminute'],
+        "sign": weatherResponse['sign']
+      };
+    });
   }
 }
