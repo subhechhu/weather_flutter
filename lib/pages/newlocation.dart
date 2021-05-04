@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:worldclock/services/time_response.dart';
 import 'package:worldclock/services/weatherservices.dart';
 import 'package:intl/intl.dart';
 import 'package:progress_dialog/progress_dialog.dart';
+import 'package:worldclock/services/weather_response.dart';
 
 class NewLocation extends StatefulWidget {
   @override
@@ -14,6 +16,7 @@ class NewLocation extends StatefulWidget {
 class _NewLocationState extends State<NewLocation> {
   List _items = [];
   bool isSearching = false;
+  WeatherResponse weatherResponse;
 
   ProgressDialog pr;
 
@@ -72,7 +75,7 @@ class _NewLocationState extends State<NewLocation> {
     );
   }
 
-  Future<List> readJson() async {
+  Future<void> readJson() async {
     final String response =
         await rootBundle.loadString('assets/countries.json');
     final data = await json.decode(response);
@@ -82,55 +85,46 @@ class _NewLocationState extends State<NewLocation> {
   }
 
   void updateLocation(item) async {
-    String country = item['name'];
-    String region = item['region'];
-    String city = item['capital'];
-    String flag = item['alpha2Code'].toLowerCase();
+    pr.show();
 
     String sign = item['timezones'][3];
-    String offsetHour = item['timezones'].substring(4, 6);
-    String offsetMinute = item['timezones'].substring(7, 9);
+    String offSetHour = item['timezones'].substring(4, 6);
+    String offSetMinute = item['timezones'].substring(7, 9);
+    String city = item['capital'];
+    String country = item['name'];
 
     DateTime currentUtc = DateTime.now().toUtc();
     DateTime current;
     if (sign == "+")
       current = currentUtc.add(Duration(
-          hours: int.parse(offsetHour), minutes: int.parse(offsetMinute)));
+          hours: int.parse(offSetHour), minutes: int.parse(offSetMinute)));
     else
       current = currentUtc.subtract(Duration(
-          hours: int.parse(offsetHour), minutes: int.parse(offsetMinute)));
+          hours: int.parse(offSetHour), minutes: int.parse(offSetMinute)));
 
     String currentTime = DateFormat.jm().format(current);
-    bool isDay = current.hour > 6 && current.hour < 18 ? true : false;
 
-    pr.show();
+    TimeResponse timeResponse = TimeResponse();
+    timeResponse.country = country;
+    timeResponse.region = item['region'];
+    timeResponse.location = city;
+    timeResponse.flag = item['alpha2Code'].toLowerCase();
+    timeResponse.sign = sign;
+    timeResponse.offSetHour = offSetHour;
+    timeResponse.offSetMinute = offSetMinute;
+    timeResponse.time = currentTime;
 
     Weather weather = Weather(location: city);
-    await weather.getWeather();
+    weatherResponse = await weather.getWeather();
     pr.hide();
-
+    print("line 110");
+    print("line 111");
     if (country == item['capital']) {
       country = "";
     }
 
-    Navigator.pop(context, {
-      'country': country,
-      'region': region,
-      'location': item['capital'],
-      'flag': flag,
-      'time': currentTime,
-      'isDay': isDay,
-      'temp_c': weather.temp_c,
-      'weather_code': weather.code,
-      'weather_type': weather.type,
-      'wind_kph': weather.wind_kph,
-      'precip_mm': weather.precip_mm,
-      'humidity': weather.humidity,
-      'cloud': weather.cloud,
-      'sign': sign,
-      'offsethour': offsetHour,
-      'offsetminute': offsetMinute
-    });
+    Navigator.pop(context,
+        {'weather_response': weatherResponse, 'timeResponse': timeResponse});
   }
 
   void styleDialog(ProgressDialog pr) {

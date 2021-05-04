@@ -1,8 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:worldclock/services/getIcons.dart';
 import 'package:intl/intl.dart';
+import 'package:worldclock/services/getIcons.dart';
+import 'package:worldclock/services/time_response.dart';
+import 'package:worldclock/services/weather_response.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -10,34 +10,27 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  Map weatherResponse = {};
-  int code;
-  String sign, offsethour, offsetminute;
+  // String country, location, region, time, flag, offSetHour, offSetMinute, sign;
+  String bgImage;
+  bool isDay;
+  Color textColor;
+
+  WeatherResponse weatherResponse;
+  TimeResponse timeResponse;
+
+  Map splashData = {};
 
   @override
   Widget build(BuildContext context) {
-    weatherResponse = weatherResponse.isNotEmpty
-        ? weatherResponse
-        : ModalRoute.of(context).settings.arguments;
-
-    String location = weatherResponse['location'];
-    code = weatherResponse['weather_code'];
-    String country = weatherResponse['country'];
-    String region = weatherResponse['region'];
-    String type = weatherResponse['weather_type'];
-    bool isDay = weatherResponse['isDay'];
-    String time = weatherResponse['time'];
-    String flag = weatherResponse['flag'];
-    String bgImage = isDay ? 'day.png' : 'night.png';
-    Color textColor = isDay ? Colors.grey[700] : Colors.grey[500];
-    String temp = weatherResponse['temp_c'].toString() + ' °C';
-    String wind = weatherResponse['wind_kph'].toString() + ' km/h';
-    String rain = weatherResponse['precip_mm'].toString() + " mm";
-    String humidity = weatherResponse['humidity'].toString() + "%";
-    String cloud = weatherResponse['cloud'].toString() + "%";
-    offsethour = weatherResponse['offsethour'];
-    offsetminute = weatherResponse['offsetminute'];
-    sign = weatherResponse['sign'];
+    if (splashData.isEmpty) {
+      splashData = ModalRoute.of(context).settings.arguments;
+      print(splashData);
+      weatherResponse = splashData['weather_response'];
+      timeResponse = splashData['time_response'];
+      isDay = weatherResponse.isDay == 1;
+    }
+    bgImage = isDay ? 'day.png' : 'night.png';
+    textColor = isDay ? Colors.grey[700] : Colors.grey[500];
 
     return Scaffold(
         body: Container(
@@ -45,52 +38,50 @@ class _HomeState extends State<Home> {
       decoration: BoxDecoration(
           image: DecorationImage(
               image: AssetImage('assets/$bgImage'), fit: BoxFit.fill)),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            SizedBox.fromSize(
-              size: Size(50, 50), // button width and height
-              child: ClipOval(
-                child: Material(
-                  color: Colors.blueGrey.withOpacity(0.5), // button color
-                  child: InkWell(
-                    splashColor: Colors.grey[600], // splash color
-                    onTap: () {
-                      updateTime();
-                    }, // button pressed
-                    child: Icon(
-                      Icons.refresh,
-                      color: Colors.white,
-                    ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SizedBox.fromSize(
+            size: Size(50, 50),
+            child: ClipOval(
+              child: Material(
+                color: Colors.blueGrey.withOpacity(0.5), // button color
+                child: InkWell(
+                  splashColor: Colors.grey[600], // splash color
+                  onTap: () {
+                    updateTime(timeResponse.sign, timeResponse.offSetHour,
+                        timeResponse.offSetMinute);
+                  }, // button pressed
+                  child: Icon(
+                    Icons.refresh,
+                    color: Colors.white,
                   ),
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 100, 0, 0),
-              child: Row(
+          ),
+          Padding(padding: EdgeInsets.all(20),
+          child: Column(
+            children: [
+              Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    location,
+                    timeResponse.location,
                     style: TextStyle(
                         fontSize: 20, color: textColor, letterSpacing: 2),
                   ),
                   SizedBox(
                     width: 10,
                   ),
-                  Image.network('https://flagcdn.com/32x24/$flag.png'),
+                  Image.network(
+                      'https://flagcdn.com/32x24/${timeResponse.flag}.png'),
                 ],
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
-              child: Row(
+              Row(
                 children: [
                   Text(
-                    country,
+                    timeResponse.country,
                     style: TextStyle(
                         fontSize: 20, color: textColor, letterSpacing: 2),
                   ),
@@ -98,35 +89,19 @@ class _HomeState extends State<Home> {
                     width: 10,
                   ),
                   Text(
-                    region,
+                    timeResponse.region,
                     style: TextStyle(
                         fontSize: 20, color: textColor, letterSpacing: 2),
                   ),
                   TextButton.icon(
                     onPressed: () async {
                       dynamic result =
-                          await Navigator.pushNamed(context, '/newlocation');
+                      await Navigator.pushNamed(context, '/newlocation');
                       print("in main");
-                      print(result);
                       setState(() {
-                        weatherResponse = {
-                          "country": result['country'],
-                          "region": result['region'],
-                          "location": result['location'],
-                          "flag": result['flag'],
-                          "time": result['time'],
-                          "isDay": result['isDay'],
-                          "temp_c": result['temp_c'],
-                          "weather_code": result['weather_code'],
-                          "weather_type": result['weather_type'],
-                          "wind_kph": result['wind_kph'],
-                          "precip_mm": result['precip_mm'],
-                          "humidity": result['humidity'],
-                          "cloud": result['cloud'],
-                          "offsethour": result['offsethour'],
-                          "offsetminute": result['offsetminute'],
-                          "sign": result['sign']
-                        };
+                        weatherResponse = result['weather_response'];
+                        timeResponse = result['timeResponse'];
+                        isDay = weatherResponse.isDay == 1;
                       });
                     },
                     icon: Icon(
@@ -138,53 +113,56 @@ class _HomeState extends State<Home> {
                   ),
                 ],
               ),
-            ),
-            SizedBox(
-              height: 50,
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
-              child: Text(
-                time,
+              SizedBox(height: 50,),
+              Text(
+                timeResponse.time,
                 style: TextStyle(
                     fontSize: 80,
                     color: textColor,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 2),
               ),
-            ),
-            SizedBox(
-              height: 250,
-            ),
-            getWeather(GetIcon.getWeatherIcon(code), "Weather", type),
-            BottomAppBar(
-              color: Colors.transparent,
-              elevation: 0,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    getBottomView(Icons.device_thermostat, "Temperature", temp),
-                    SizedBox(width: 10),
-                    getBottomView(Icons.waves_sharp, "Wind", wind),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    getBottomView(Icons.beach_access, "Rain", rain),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    getBottomView(Icons.whatshot, "Humidity", humidity),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    getBottomView(Icons.cloud, "Cloud", cloud)
-                  ],
+            ],
+          ),),
+          Padding(padding: EdgeInsets.all(0),
+          child: Column(
+            children: [
+              getWeather(GetIcon.getWeatherIcon(weatherResponse.code), "Weather",
+                  weatherResponse.text),
+              BottomAppBar(
+                color: Colors.transparent,
+                elevation: 0,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      getBottomView(Icons.device_thermostat, "Temperature",
+                          weatherResponse.tempC.toString() + ' °C'),
+                      SizedBox(width: 10),
+                      getBottomView(Icons.waves_sharp, "Wind",
+                          weatherResponse.windKph.toString() + ' km/h'),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      getBottomView(Icons.beach_access, "Rain",
+                          weatherResponse.precipMm.toString() + " mm"),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      getBottomView(Icons.whatshot, "Humidity",
+                          weatherResponse.humidity.toString() + "%"),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      getBottomView(Icons.cloud, "Cloud",
+                          weatherResponse.cloud.toString() + "%")
+                    ],
+                  ),
                 ),
-              ),
-            )
-          ],
-        ),
+              )
+            ],
+          ),)
+        ],
       ),
     ));
   }
@@ -200,9 +178,9 @@ class _HomeState extends State<Home> {
               splashColor: Colors.grey[600],
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(code == 0
-                      ? "Could not generate weather for ${weatherResponse['location']}"
-                      : "$type in ${weatherResponse['location']}:   $val"),
+                  content: Text(weatherResponse.code == 0
+                      ? "Could not generate weather for ${timeResponse.location}}"
+                      : "$type in ${timeResponse.location} : $val"),
                   duration: Duration(seconds: 5),
                 ));
               },
@@ -238,9 +216,9 @@ class _HomeState extends State<Home> {
                 splashColor: Colors.grey[600], // splash color
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(code == 0
-                        ? "$type error ${weatherResponse['location']}"
-                        : "$type in ${weatherResponse['location']}:   $val"),
+                    content: Text(weatherResponse.code == 0
+                        ? "$type error ${timeResponse.location}"
+                        : "$type in ${timeResponse.location} at ${timeResponse.time}: $val"),
                     duration: Duration(seconds: 5),
                   ));
                 }, // button pressed
@@ -267,7 +245,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  void updateTime() {
+  void updateTime(sign, offsethour, offsetminute) {
     DateTime currentUtc = DateTime.now().toUtc();
     DateTime current;
     if (sign == "+")
@@ -276,29 +254,8 @@ class _HomeState extends State<Home> {
     else
       current = currentUtc.subtract(Duration(
           hours: int.parse(offsethour), minutes: int.parse(offsetminute)));
-
-    String currentTime = DateFormat.jm().format(current);
-    bool isDay = current.hour > 6 && current.hour < 18 ? true : false;
-
     setState(() {
-      weatherResponse = {
-        "country": weatherResponse['country'],
-        "region": weatherResponse['region'],
-        "location": weatherResponse['location'],
-        "flag": weatherResponse['flag'],
-        "time": currentTime,
-        "isDay": isDay,
-        "temp_c": weatherResponse['temp_c'],
-        "weather_code": weatherResponse['weather_code'],
-        "weather_type": weatherResponse['weather_type'],
-        "wind_kph": weatherResponse['wind_kph'],
-        "precip_mm": weatherResponse['precip_mm'],
-        "humidity": weatherResponse['humidity'],
-        "cloud": weatherResponse['cloud'],
-        "offsethour": weatherResponse['offsethour'],
-        "offsetminute": weatherResponse['offsetminute'],
-        "sign": weatherResponse['sign']
-      };
+      timeResponse.time = DateFormat.jm().format(current);
     });
   }
 }

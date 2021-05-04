@@ -1,5 +1,5 @@
 class GetIcon {
-  static String asset = 'assets';
+  static String asset = 'images';
   static String getWeatherIcon(code) {
     switch (code) {
       case 0:
@@ -99,5 +99,6 @@ class GetIcon {
       case 1282:
         return asset + '/395.png';
     }
+    return asset + '/0.png';
   }
 }
