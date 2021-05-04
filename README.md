@@ -4,7 +4,8 @@ A Flutter Application to get the current time & weather of the [almost] all the 
 in the world.
 
 It is just a demo project to check flutter & dart!
-[ss_0](https://user-images.githubusercontent.com/13517085/116992312-8ac40800-acf5-11eb-9172-3d239b76adf2.jpeg)
+
+![ss_0](https://user-images.githubusercontent.com/13517085/116992312-8ac40800-acf5-11eb-9172-3d239b76adf2.jpeg)
 ![ss_1](https://user-images.githubusercontent.com/13517085/116992329-8e578f00-acf5-11eb-8d37-eca0a9664aac.jpeg)
 ![ss_2](https://user-images.githubusercontent.com/13517085/116992337-90b9e900-acf5-11eb-80d3-f8ce3955590e.jpeg)
 ![ss_3](https://user-images.githubusercontent.com/13517085/116992344-9283ac80-acf5-11eb-8bfc-4d661bf90754.jpeg)
