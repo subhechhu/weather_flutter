@@ -5,17 +5,26 @@ in the world.
 
 It is just a demo project to check flutter & dart!
 
+
+sources of background img:
+
+https://www.pinterest.com/pin/563512972121745483/, 
+https://www.pinterest.com/pin/305611524703765426/,
+https://www.pinterest.com/pin/740771838705462855/
+
+
+Weather API Used: https://www.weatherapi.com/
+
+Flag Image: https://flagcdn.com/
+
+
+# Screenshot
+
 ![ss_0](https://user-images.githubusercontent.com/13517085/116992312-8ac40800-acf5-11eb-9172-3d239b76adf2.jpeg)
 ![ss_1](https://user-images.githubusercontent.com/13517085/116992329-8e578f00-acf5-11eb-8d37-eca0a9664aac.jpeg)
 ![ss_2](https://user-images.githubusercontent.com/13517085/116992337-90b9e900-acf5-11eb-80d3-f8ce3955590e.jpeg)
 ![ss_3](https://user-images.githubusercontent.com/13517085/116992344-9283ac80-acf5-11eb-8bfc-4d661bf90754.jpeg)
 ![ss_4](https://user-images.githubusercontent.com/13517085/116992345-93b4d980-acf5-11eb-8d7a-ef3b30efd233.jpeg)
-
-
-sources of background img: https://www.pinterest.com/pin/563512972121745483/, https://www.pinterest.com/pin/305611524703765426/, https://www.pinterest.com/pin/740771838705462855/
-
-Weather API Used: https://www.weatherapi.com/
-Flag Image: https://flagcdn.com/
 
 
 
