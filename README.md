@@ -18,7 +18,7 @@ Weather API Used: https://www.weatherapi.com/
 Flag Image: https://flagcdn.com/
 
 
-# Screenshot
+# Screenshots
 
 ![ss_0](https://user-images.githubusercontent.com/13517085/116992312-8ac40800-acf5-11eb-9172-3d239b76adf2.jpeg)
 ![ss_1](https://user-images.githubusercontent.com/13517085/116992329-8e578f00-acf5-11eb-8d37-eca0a9664aac.jpeg)
